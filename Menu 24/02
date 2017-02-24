@@ -1,0 +1,91 @@
+#include "stdafx.h"
+#include <iostream>
+#include <conio.h>
+using namespace std;
+int contar(int x)
+{int i;
+  i=0;
+ while(x>0)
+ {x=x/10;
+  i++;
+ }
+ return(i);
+}
+int pares(int x)
+{int i=0;
+ while(x>0)
+ { if(x%2==0)
+    {i++;}
+    x=x/10;
+ }
+ return(i);
+}
+int invertir(int x)
+{int i,s,r;
+ s=0;
+ while(x>0)
+ {   r=x%10;
+	 s=(s*10)+r;
+	 x=x/10;
+ }
+ return(s);
+}
+int impares(int x)
+{int i,s,r,d;
+i=0,s=0;
+while(x>0)
+ {   r=x%10;
+	 if(r%2!=0)
+	 {s=(s*10)+r;}
+	 x=x/10;
+ }
+while(s>0)
+	{d=s%10;
+	 i=(i*10)+d;
+	 s=s/10;
+ }
+
+
+ return(i);
+}
+
+void main()
+{int a,b,op;
+cout<<"\n       M E N U\n";
+cout<<"1.- Contar digitos ";
+cout<<"\n2.- Contar digitos pares";
+cout<<"\n3.- Invertir numero";
+cout<<"\n4.- Ingresar un numero y devolver sin digitos pares";
+cout<<"\n5.- Salir";
+cout<<"\n Seleccionar opcion:";
+cin>>op;
+switch(op)
+{case 1:
+ cout<<"\nIngrese un numero:";
+ cin>> a;
+ b=contar(a);
+ cout<<"\nEl numero de digitos es:"<<b<<"\n";
+ break;
+ case 2:
+ cout<<"\nIngrese un numero:";
+ cin>> a;
+ b=pares(a);
+ cout<<"\nLa cantidad de digitos pares es:"<<b<<"\n";
+ break;
+ case 3:
+ cout<<"\nIngrese un numero:";
+ cin>>a;
+ b=invertir(a);
+ cout<<"\nEl numero invertido es:"<<b<<"\n";
+ break;
+ case 4:
+ cout<<"\nIngrese un numero:";
+ cin>>a;
+ b=impares(a);
+ cout<<"\nEl numero sin digitos pares es:"<<b<<"\n";
+ break;
+
+}
+getch();
+}
+
