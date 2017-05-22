@@ -1,0 +1,203 @@
+#include<iostream>
+#include<conio.h>
+#include<string.h>
+#include<stdio.h>
+
+using namespace std;
+
+struct regAmigo{
+	char nombre[30];
+	char sexo;//F de femenino y M de masculino
+	int  edad;
+	char estado;//A de activo y E de eliminado
+};
+
+void crearArchivo(char nombArch[]){
+	FILE *ptr;
+	ptr = fopen(nombArch,"wb");
+	fclose(ptr);
+}
+
+void adicionarAmigo(){
+	FILE *ptr;
+	regAmigo reg;
+	ptr = fopen("amigos.dat","ab");
+	cout << "Introducir nombre de amigo(a) : ";
+	do{
+		gets(reg.nombre);
+	}while(strlen(reg.nombre) == 0);
+	do{
+		cout << "Sexo <F/M> ? : ";
+		cin  >> reg.sexo;
+	}while(reg.sexo != 'F' && reg.sexo != 'M');//valida entrada para sexo
+	do{
+		cout << "Edad ? : ";
+		cin  >> reg.edad;
+		if(reg.edad < 1 || reg.edad > 100){
+			cout <<"\nError...!!! Debe ser un valor entre 1 y 100.\n";
+		}
+	}while(reg.edad < 1 || reg.edad > 100);//valida entrada de edad en un rango de 1 a 100
+	reg.estado = 'A';
+	fwrite(&reg,sizeof(reg),1,ptr);//escribe registro en archivo
+	fclose(ptr);
+}
+
+
+void listarAmigos(){
+	FILE *ptr;
+	regAmigo reg;
+	int c = 0;
+	ptr = fopen("amigos.dat","rb");
+	if(ptr != NULL){
+		fread(&reg,sizeof(reg),1,ptr);//lee registro desde el archivo
+		while(feof(ptr) == false){
+			c++;
+			if(reg.estado == 'A'){//verifica si el registo esta activo 
+				cout <<endl<<c<<". "<<reg.nombre<<"\t"<<reg.edad<<"\t"<<reg.sexo;
+			}
+			fread(&reg,sizeof(reg),1,ptr);//lee registro desde el archivo
+		}		
+		fclose(ptr);
+	}else{
+		cout << "\nError...!!!, archivo no existe..\n";
+	}	
+}
+
+void buscarAmigo(int nroReg){
+	FILE *ptr;
+	regAmigo reg;	
+	ptr = fopen("amigos.dat","rb");
+	if(ptr != NULL){
+		fseek(ptr,(nroReg - 1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);//lee registro desde el archivo
+		if(feof(ptr) == false){			
+			if(reg.estado == 'A'){//verifica si el registo esta activo 
+				cout <<endl<<nroReg<<". "<<reg.nombre<<"\t"<<reg.edad<<"\t"<<reg.sexo;
+			}else{
+				cout << "\nError...!!!, registro fue eliminado previamente\n";
+			}
+		}else{
+				cout << "\nError...!!!, registro NO existe.\n";
+		}
+		fclose(ptr);
+	}else{
+		cout << "\nError...!!!, archivo no existe..\n";
+	}	
+}
+
+void modificarAmigo(int nroReg){
+	FILE *ptr;
+	regAmigo reg;	
+	char  op;
+	ptr = fopen("amigos.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(nroReg - 1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);//lee registro desde el archivo
+		if(feof(ptr) == false){			
+			if(reg.estado == 'A'){//verifica si el registo esta activo 
+				cout <<endl<<nroReg<<". "<<reg.nombre<<"\t"<<reg.edad<<"\t"<<reg.sexo;
+				cout <<"\n\n\tEsta seguro de modificar este registro <S/N> ? : ";
+				cin  >> op;
+				if(op=='s'  || op=='S'){
+						cout << "Introducir nombre de amigo(a) : ";
+						do{
+							gets(reg.nombre);
+						}while(strlen(reg.nombre) == 0);
+						do{
+							cout << "Sexo <F/M> ? : ";
+							cin  >> reg.sexo;
+						}while(reg.sexo != 'F' && reg.sexo != 'M');//valida entrada para sexo
+						do{
+							cout << "Edad ? : ";
+							cin  >> reg.edad;
+							if(reg.edad < 1 || reg.edad > 100){
+								cout <<"\nError...!!! Debe ser un valor entre 1 y 100.\n";
+							}
+						}while(reg.edad < 1 || reg.edad > 100);//valida entrada de edad en un rango de 1 a 100
+						fseek(ptr,(nroReg - 1)*sizeof(reg),SEEK_SET);
+						fwrite(&reg,sizeof(reg),1,ptr);//escribe registro en archivo
+						cout << "\nEl registro fue modificado exitosamente.\n";
+				}else{
+					cout << "\nEl registro No fue Modificado\n";
+				}
+			}else{
+				cout << "\nError...!!!, registro fue eliminado previamente\n";
+			}
+		}else{
+				cout << "\nError...!!!, registro NO existe.\n";
+		}
+		fclose(ptr);
+	}else{
+		cout << "\nError...!!!, archivo no existe..\n";
+	}	
+}
+
+void eliminarAmigo(int nroReg){
+	FILE *ptr;
+	regAmigo reg;	
+	char  op;
+	ptr = fopen("amigos.dat","r+b");
+	if(ptr != NULL){
+		fseek(ptr,(nroReg - 1)*sizeof(reg),SEEK_SET);
+		fread(&reg,sizeof(reg),1,ptr);//lee registro desde el archivo
+		if(feof(ptr) == false){			
+			if(reg.estado == 'A'){//verifica si el registo esta activo 
+				cout <<endl<<nroReg<<". "<<reg.nombre<<"\t"<<reg.edad<<"\t"<<reg.sexo;
+				cout <<"\n\n\tEsta seguro de eliminar este registro <S/N> ? : ";
+				cin  >> op;
+				if(op=='s'  || op=='S'){
+						reg.estado = 'E';//marca el registro como eliminado
+						fseek(ptr,(nroReg - 1)*sizeof(reg),SEEK_SET);
+						fwrite(&reg,sizeof(reg),1,ptr);//escribe registro en archivo
+						cout << "\nEl registro fue eliminado exitosamente.\n";
+				}else{
+					cout << "\nEl registro No fue eliminado\n";
+				}
+			}else{
+				cout << "\nError...!!!, registro fue eliminado previamente\n";
+			}
+		}else{
+				cout << "\nError...!!!, registro NO existe.\n";
+		}
+		fclose(ptr);
+	}else{
+		cout << "\nError...!!!, archivo no existe..\n";
+	}	
+}
+
+
+void main(){
+	int opcion,nroReg;
+	do{
+		cout <<"\n\n\t\t*** M E N U ***";
+		cout <<"\n\t1.- Crear archivo";
+		cout <<"\n\t2.- Agregar amigo";
+		cout <<"\n\t3.- Mostrar listado de amigos";
+		cout <<"\n\t4.- Buscar - Acceso directo";
+		cout <<"\n\t5.- Modificar - Acceso directo";
+		cout <<"\n\t6.- Eliminar - Acceso directo";
+		cout <<"\n\t0.- Salir";
+		cout <<"\n\tSeleccione opcion : ";
+		cin >> opcion;
+		switch( opcion ){
+			case 1: crearArchivo("amigos.dat");
+					break;
+			case 2: adicionarAmigo();
+					break;
+			case 3: listarAmigos();
+					break;
+			case 4: cout << "\n\nIntroducir el numero de registro del amigo a buscar : ";
+					cin  >> nroReg;
+					buscarAmigo(nroReg);
+					break;
+			case 5: cout << "\n\nIntroducir el numero de registro del amigo a modificar : ";
+					cin  >> nroReg;
+					modificarAmigo(nroReg);
+					break;
+			case 6: cout << "\n\nIntroducir el numero de registro del amigo a eliminar : ";
+					cin  >> nroReg;
+					eliminarAmigo(nroReg);
+					break;
+		}
+	}while(opcion != 0);	
+}
